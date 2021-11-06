@@ -2,20 +2,46 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Burak.Application.Prize.Data;
+using Burak.Application.Prize.Utilities;
+using Burak.Application.Prize.Utilities.ConfigModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using NLog.Extensions.Logging;
 
 namespace Burak.Application.Prize
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+         
+            services.AddLogging(builder => builder.AddNLog());
+            services.AddMvc(options => options.EnableEndpointRouting = false);
+            AddSelectedDataStorage(services);
+            AddMappers(services);
+            AddValidations(services);
+            AddBusinessServices(services);
+
+
+            services.AddSwaggerGen(c =>
+            c.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "Authorization API", Version = "v1" }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -26,15 +52,64 @@ namespace Burak.Application.Prize
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(option => option.AllowAnyHeader()
+                                        .AllowAnyMethod()
+                                        .AllowAnyOrigin());
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "Authorization API");
+            });
+
+            app.UseHttpsRedirection();
+
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllers();
             });
+        }
+
+        private void AddSelectedDataStorage(IServiceCollection services)
+        {
+            DataStorage dataStorage = ConfigurationHelper.GetDataStorage(Configuration);
+
+            switch (dataStorage.DataStorageType)
+            {
+                case DataStorageTypes.SqlServer:
+                    services.AddDbContext<DataContext>(builder => builder.UseSqlServer(dataStorage.ConnectionString));
+                    break;
+                case DataStorageTypes.PostgreServer:
+                    services.AddDbContext<DataContext>(builder => builder.UseNpgsql(dataStorage.ConnectionString));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"{dataStorage.DataStorageType} has not been pre-defined");
+            }
+        }
+
+        private void AddMappers(IServiceCollection services)
+        {
+            //TODO: Create and add which model mapped to which
+            //services.AddAutoMapper(typeof(UserMappingProfiles));
+        }
+
+        private void AddValidations(IServiceCollection services)
+        {
+            //TODO: Add Request Validators
+            //services.AddSingleton<IValidatorResolver, ValidatorResolver>();
+            //services.AddSingleton<IValidator, UserRequestValidator>();
+        }
+
+        private void AddBusinessServices(IServiceCollection services)
+        {
+            //TODO: Add Services (external,internal)
+            //services.AddScoped<IUserService, UserService>();
+            //services.AddScoped<IShopExternalService, ShopExternalService>();
         }
     }
 }
