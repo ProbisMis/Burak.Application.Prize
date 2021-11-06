@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Burak.Application.Prize.Business.Services;
+using Burak.Application.Prize.Business.Services.Interface;
 using Burak.Application.Prize.Data;
 using Burak.Application.Prize.Utilities;
 using Burak.Application.Prize.Utilities.ConfigModels;
@@ -109,8 +111,9 @@ namespace Burak.Application.Prize
         private void AddBusinessServices(IServiceCollection services)
         {
             //TODO: Add Services (external,internal)
-            //services.AddScoped<IUserService, UserService>();
-            //services.AddScoped<IShopExternalService, ShopExternalService>();
+            services.AddScoped<IPlayerService, PlayerService>();
+            services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<IRewardService, RewardService>();
         }
     }
 }

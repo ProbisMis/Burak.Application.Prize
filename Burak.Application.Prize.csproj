@@ -6,9 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Business\Mappers\" />
-    <Folder Include="Business\Services\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="Models\" />
+    <Folder Include="Models\Request\" />
   </ItemGroup>
 
   <ItemGroup>
