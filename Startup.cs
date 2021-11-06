@@ -41,7 +41,7 @@ namespace Burak.Application.Prize
 
 
             services.AddSwaggerGen(c =>
-            c.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "Authorization API", Version = "v1" }));
+            c.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "Prize API", Version = "v1" }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,7 +59,8 @@ namespace Burak.Application.Prize
             app.UseSwagger();
 
             app.UseSwaggerUI(c => {
-                c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "Authorization API");
+                c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "Prize API");
+                c.RoutePrefix = string.Empty;
             });
 
             app.UseHttpsRedirection();

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Burak.Application.Prize.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,9 @@ namespace Burak.Application.Prize.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        //public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Player> Players { get; set; }
+        public virtual DbSet<Wallet> Wallets { get; set; }
+        public virtual DbSet<Reward> Rewards { get; set; }
+        public virtual DbSet<LevelCompletionReward> LevelCompletionRewards { get; set; }
     }
 }
