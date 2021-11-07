@@ -19,16 +19,16 @@ namespace Burak.Application.Prize.Business.Services
            
         }
 
-        #region User CRUD
-        public async Task<Player> Create(Player userRequest)
+        #region Player CRUD
+        public async Task<Player> Create(Player player)
         {
             var updateDate = DateTime.Now;
 
-            userRequest.CreatedOnUtc = updateDate;
-            userRequest.UpdatedOnUtc = updateDate;
-            userRequest.IsDeleted = false;
+            player.CreatedOnUtc = updateDate;
+            player.UpdatedOnUtc = updateDate;
+            player.IsDeleted = false;
 
-            var user = _dataContext.player.Add(userRequest);
+            var user = _dataContext.player.Add(player);
             await _dataContext.SaveChangesAsync();
 
             return user.Entity;

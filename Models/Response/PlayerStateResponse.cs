@@ -8,6 +8,7 @@ namespace Burak.Application.Prize.Models.Response
     public class PlayerStateResponse
     {
         public bool isSuccess { get; set; }
+        public String Message { get; set; }
         public PlayerResponse player { get; set; }
         public WalletResponse wallet { get; set; }
         public RewardResponse rewards { get; set; }

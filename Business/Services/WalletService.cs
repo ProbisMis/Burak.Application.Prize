@@ -20,12 +20,18 @@ namespace Burak.Application.Prize.Business.Services
 
         public async Task<Wallet> Create(Wallet wallet)
         {
-            throw new NotImplementedException();
+            var walletResponse = _dataContext.wallet.Add(wallet);
+            await _dataContext.SaveChangesAsync();
+
+            return walletResponse.Entity;
         }
 
         public async Task<Wallet> Delete(Wallet wallet)
         {
-            throw new NotImplementedException();
+            var walletResponse = _dataContext.wallet.Remove(wallet);
+            await _dataContext.SaveChangesAsync();
+
+            return walletResponse.Entity;
         }
 
         public async Task<Wallet> Update(Wallet wallet)

@@ -39,7 +39,6 @@ namespace Burak.Application.Prize
             services.AddMvc(options => options.EnableEndpointRouting = false);
             AddSelectedDataStorage(services);
             AddMappers(services);
-            AddValidations(services);
             AddBusinessServices(services);
 
 
@@ -98,20 +97,12 @@ namespace Burak.Application.Prize
 
         private void AddMappers(IServiceCollection services)
         {
-            //TODO: Create and add which model mapped to which
             services.AddAutoMapper(typeof(PlayerStateMappingProfiles));
         }
 
-        private void AddValidations(IServiceCollection services)
-        {
-            //TODO: Add Request Validators
-            //services.AddSingleton<IValidatorResolver, ValidatorResolver>();
-            //services.AddSingleton<IValidator, UserRequestValidator>();
-        }
 
         private void AddBusinessServices(IServiceCollection services)
         {
-            //TODO: Add Services (external,internal)
             services.AddScoped<IPlayerService, PlayerService>();
             services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<IRewardService, RewardService>();

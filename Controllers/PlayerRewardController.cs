@@ -38,6 +38,11 @@ namespace Burak.Application.Prize.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Levels up player
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
         [HttpPost("{playerId}/levelup")]
         public async Task<PlayerStateResponse> PlayerLevelUp([FromRoute] int playerId)
         {
@@ -47,9 +52,9 @@ namespace Burak.Application.Prize.Controllers
             {
                 var user = await _playerService.GetPlayerById(playerId);
 
-                if (user == null) return null;
+                if (user == null) throw new Exception("User can not be found");
                 var wallet = await _walletService.GetWalletByPlayerById(playerId);
-                if (wallet == null) return null;
+                if (wallet == null) throw new Exception("Wallet can not be found");
                 wallet = await _walletService.LevelUp(wallet);
                 await _rewardService.GenerateRandomReward(playerId);
                 var rewards = await _rewardService.GetRewardByPlayerById(playerId);
@@ -59,6 +64,7 @@ namespace Burak.Application.Prize.Controllers
             }
             catch (Exception ex)
             {
+                playerStateResponse.Message = ex.Message;
                 playerStateResponse.isSuccess = false;
             }
 
@@ -66,6 +72,11 @@ namespace Burak.Application.Prize.Controllers
             return playerStateResponse;
         }
 
+        /// <summary>
+        /// Gets Player's data
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
         [HttpGet("{playerId}/state")]
         public async Task<PlayerStateResponse> PlayerGetState([FromRoute] int playerId)
         {
@@ -82,11 +93,18 @@ namespace Burak.Application.Prize.Controllers
             }
             catch (Exception ex)
             {
+                playerStateResponse.Message = ex.Message;
                 playerStateResponse.isSuccess = false;
             }
             return playerStateResponse;
         }
 
+        /// <summary>
+        /// Collects available rewards 
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <param name="rewardId"></param>
+        /// <returns></returns>
         [HttpPost("{playerId}/collect/{rewardId}")]
         public async Task<PlayerStateResponse> PlayerCollectReward([FromRoute] int playerId, [FromRoute] int rewardId)
         {   
@@ -100,6 +118,7 @@ namespace Burak.Application.Prize.Controllers
             }
             catch (Exception ex)
             {
+                playerStateResponse.Message = ex.Message;
                 playerStateResponse.isSuccess = false;
             }
 

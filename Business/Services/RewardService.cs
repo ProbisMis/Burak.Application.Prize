@@ -1,6 +1,7 @@
 ﻿using Burak.Application.Prize.Business.Services.Interface;
 using Burak.Application.Prize.Data;
 using Burak.Application.Prize.Data.Models;
+using Burak.Application.Prize.Utilities;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,16 @@ namespace Burak.Application.Prize.Business.Services
 
         public async Task<Rewards> Create(Rewards reward)
         {
-            throw new NotImplementedException();
+            _dataContext.rewards.Add(reward);
+            await _dataContext.SaveChangesAsync();
+            return reward;
+        }
+
+        public async Task<Rewards> Update(Rewards reward)
+        {
+            _dataContext.rewards.Update(reward);
+            await _dataContext.SaveChangesAsync();
+            return reward;
         }
 
         public async Task<Rewards> Delete(Rewards reward)
@@ -41,9 +51,7 @@ namespace Burak.Application.Prize.Business.Services
                 RewardId = levelReward.Id,
                 Reward = levelReward.Reward
             };
-            _dataContext.rewards.Add(reward);
-            await _dataContext.SaveChangesAsync();
-
+            await Create(reward);
             return reward;
         }
 
@@ -54,29 +62,27 @@ namespace Burak.Application.Prize.Business.Services
                 return reward.First();
             return null;
         }
-        private async Task<LevelCompletionReward> GetRandomReward()
-        {
-            Random random = new Random();
-            var skip = (int)(random.NextDouble() * _dataContext.levelcompletionreward.Count());
-            var reward = _dataContext.levelcompletionreward.OrderBy(x => x.Id).Skip(skip).Take(1).First();
-            return reward;
-        }
+       
         public async Task<Rewards> CollectPlayerReward(int playerId)
         {
-            var reward = _dataContext.rewards.Where(x => x.PlayerId == playerId).First();
-            var itemToBeCollected = parseReward(reward.Reward);
+            var reward = await  GetRewardByPlayerById(playerId);
+            if (reward == null) throw new Exception("There is no rewards to collect");
+
+            var itemToBeCollected = PlayerRewardUtil.parseReward(reward.Reward);
             if (itemToBeCollected != null)
             {
                var wallet =  _walletService.GetWalletByPlayerById(playerId).Result;
-                if (itemToBeCollected.ContainsKey("coin"))
+                if (wallet == null) throw new Exception("Player's wallet can not be found");
+
+                if (itemToBeCollected.ContainsKey(AppConstants.Coin))
                 {
-                    itemToBeCollected.TryGetValue("coin", out string coin);
+                    itemToBeCollected.TryGetValue(AppConstants.Coin, out string coin);
                     wallet.Coin += Int32.Parse(coin);
                 }
 
-                if (itemToBeCollected.ContainsKey("energy"))
+                if (itemToBeCollected.ContainsKey(AppConstants.Energy))
                 {
-                    itemToBeCollected.TryGetValue("energy", out string energy);
+                    itemToBeCollected.TryGetValue(AppConstants.Energy, out string energy);
                     wallet.Energy += Int32.Parse(energy);
                 }
 
@@ -87,23 +93,14 @@ namespace Burak.Application.Prize.Business.Services
             return reward;
         }
 
-        private Dictionary<string, string> parseReward(String reward)
+        private async Task<LevelCompletionReward> GetRandomReward()
         {
-            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-            var myJObject = JObject.Parse(reward);
-            if (myJObject.ContainsKey("coin") == true)
-                keyValuePairs.Add("coin", myJObject.First.Values().First().ToString());
-            else if (myJObject.ContainsKey("energy") == true)
-                keyValuePairs.Add("energy", myJObject.First.Values().First().ToString());
-
-            if (keyValuePairs.Count == 0)
-                return null;
-            return keyValuePairs;
+            Random random = new Random();
+            var skip = (int)(random.NextDouble() * _dataContext.levelcompletionreward.Count());
+            var reward = _dataContext.levelcompletionreward.OrderBy(x => x.Id).Skip(skip).Take(1).First();
+            return reward;
         }
 
-        public async Task<Rewards> Update(Rewards user)
-        {
-            throw new NotImplementedException();
-        }
+      
     }
 }
