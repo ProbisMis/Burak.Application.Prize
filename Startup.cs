@@ -32,9 +32,6 @@ namespace Burak.Application.Prize
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
-         
             services.AddLogging(builder => builder.AddNLog());
             services.AddMvc(options => options.EnableEndpointRouting = false);
             AddSelectedDataStorage(services);
@@ -59,19 +56,13 @@ namespace Burak.Application.Prize
                                         .AllowAnyOrigin());
 
             app.UseSwagger();
-
             app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "Prize API");
                 c.RoutePrefix = string.Empty;
             });
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
