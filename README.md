@@ -2,9 +2,12 @@
 
 ### Questions ###
 1. How can we avoid callback hell with the new features of JS?
+
 The best new feature of javascript that would help us get rid of the nested callback clutter is using promises with the new "async / await" syntax. This would allow us to await for each async function to resolve, then move on to the next one in a linear code style.
+
 2. How does NodeJS handle more than one request at the same time while it is 
 a single thread.
+
 Node.js uses a non-blocking event loop architecture to process multiple requests simultaneously in a single thread. Since most requests actually consist of stages where the time is mostly spent on waiting for a client to connect, or server to respond, node engine takes advantage of these gaps to handle multiple tasks in the event loop. Node.js also can use "worker threads" to utilize parallel, multiple threads whenever a blocking, cpu-intensive task needs to be handled.
 
 ### Installation ###
