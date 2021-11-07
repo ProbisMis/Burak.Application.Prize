@@ -8,8 +8,15 @@ namespace Burak.Application.Prize.Business.Services.Interface
 {
     public interface IRewardService
     {
-        Task<Reward> Create(Reward user);
-        Task<Reward> Update(Reward user);
-        Task<Reward> Delete(Reward user);
+        Task<Rewards> Create(Rewards user);
+        Task<Rewards> Update(Rewards user);
+        Task<Rewards> Delete(Rewards user);
+        Task<Rewards> GetRewardByPlayerById(int playerId);
+
+        Task<Rewards> GenerateRandomReward(int playerId);
+
+        Task<Rewards> CollectPlayerReward(int playerId);
+
+
     }
 }

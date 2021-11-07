@@ -1,6 +1,7 @@
 ﻿using Burak.Application.Prize.Business.Services.Interface;
 using Burak.Application.Prize.Data;
 using Burak.Application.Prize.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,33 +28,33 @@ namespace Burak.Application.Prize.Business.Services
             userRequest.UpdatedOnUtc = updateDate;
             userRequest.IsDeleted = false;
 
-            var user = _dataContext.Players.Add(userRequest);
+            var user = _dataContext.player.Add(userRequest);
             await _dataContext.SaveChangesAsync();
 
             return user.Entity;
         }
 
-        public async Task<Player> Delete(Player playerRequest)
+        public async Task<Player> Delete(Player player)
         {
             var updateDate = DateTime.Now;
 
-            playerRequest.UpdatedOnUtc = updateDate;
-            playerRequest.IsDeleted = true;
+            player.UpdatedOnUtc = updateDate;
+            player.IsDeleted = true;
 
-            var user = _dataContext.Players.Update(playerRequest);
+            var user = _dataContext.player.Update(player);
             await _dataContext.SaveChangesAsync();
 
             return user.Entity;
         }
 
 
-        public async Task<Player> Update(Player playerRequest)
+        public async Task<Player> Update(Player player)
         {
             var updateDate = DateTime.Now;
 
-            playerRequest.UpdatedOnUtc = updateDate;
+            player.UpdatedOnUtc = updateDate;
 
-            var user = _dataContext.Players.Update(playerRequest);
+            var user = _dataContext.player.Update(player);
             await _dataContext.SaveChangesAsync();
 
             return user.Entity;
@@ -61,19 +62,18 @@ namespace Burak.Application.Prize.Business.Services
 
         public async Task<Player> GetPlayerByEmail(string email)
         {
-            var user = _dataContext.Players.Where(x => x.Email == email && !x.IsDeleted && x.IsActive).First();
+            var user = _dataContext.player.Where(x => x.Email == email && !x.IsDeleted && x.IsActive).First();
             return user;
         }
 
         public async Task<Player> GetPlayerById(int userId)
         {
-            var user =  _dataContext.Players.Where(x => x.Id == userId && !x.IsDeleted && x.IsActive).First();
+            var user =  _dataContext.player.Where(x => x.Id == userId && !x.IsDeleted && x.IsActive).First();
             return user;
         }
 
-   
-
-
         #endregion
+
+    
     }
 }

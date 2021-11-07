@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Burak.Application.Prize.Business.Mappers;
 using Burak.Application.Prize.Business.Services;
 using Burak.Application.Prize.Business.Services.Interface;
 using Burak.Application.Prize.Data;
@@ -98,7 +99,7 @@ namespace Burak.Application.Prize
         private void AddMappers(IServiceCollection services)
         {
             //TODO: Create and add which model mapped to which
-            //services.AddAutoMapper(typeof(UserMappingProfiles));
+            services.AddAutoMapper(typeof(PlayerStateMappingProfiles));
         }
 
         private void AddValidations(IServiceCollection services)

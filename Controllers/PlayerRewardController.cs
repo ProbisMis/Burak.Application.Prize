@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Burak.Application.Prize.Business.Services.Interface;
+using Burak.Application.Prize.Data.Models;
 using Burak.Application.Prize.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,38 +15,108 @@ namespace Burak.Application.Prize.Controllers
     /// Player Prize API
     /// </summary>
     [ApiController]
-    [Route("player")]
+    [Route("players")]
     public class PlayerRewardController : ControllerBase
     {
         private readonly IPlayerService _playerService;
-        private readonly IRewardService _prizeService;
+        private readonly IRewardService _rewardService;
         private readonly IWalletService _walletService;
         private readonly ILogger<PlayerRewardController> _logger;
         private readonly IMapper _mapper;
 
         public PlayerRewardController(ILogger<PlayerRewardController> logger,
            IPlayerService playerService,
-           IRewardService  prizeService,
+           IRewardService  rewardService,
            IWalletService walletService,
            IMapper mapper
            )
         {
             _logger = logger;
             _playerService = playerService;
-            _prizeService = prizeService;
+            _rewardService = rewardService;
             _walletService = walletService;
             _mapper = mapper;
         }
 
-        [HttpGet("{playerId}/levelup")]
-        public async Task<PlayerResponse> LevelUpPlayer([FromRoute] int playerId)
+        [HttpPost("{playerId}/levelup")]
+        public async Task<PlayerStateResponse> PlayerLevelUp([FromRoute] int playerId)
         {
-            PlayerResponse playerResponse;
+            PlayerStateResponse playerStateResponse = new PlayerStateResponse();
             
-            var user = await _playerService.GetPlayerById(playerId);
-            playerResponse = _mapper.Map<PlayerResponse>(user);
+            try
+            {
+                var user = await _playerService.GetPlayerById(playerId);
 
-            return playerResponse;
+                if (user == null) return null;
+                var wallet = await _walletService.GetWalletByPlayerById(playerId);
+                if (wallet == null) return null;
+                wallet = await _walletService.LevelUp(wallet);
+                await _rewardService.GenerateRandomReward(playerId);
+                var rewards = await _rewardService.GetRewardByPlayerById(playerId);
+
+                playerStateResponse = mapDtoToResponse(user, wallet, rewards);
+                playerStateResponse.isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                playerStateResponse.isSuccess = false;
+            }
+
+           
+            return playerStateResponse;
+        }
+
+        [HttpGet("{playerId}/state")]
+        public async Task<PlayerStateResponse> PlayerGetState([FromRoute] int playerId)
+        {
+            PlayerStateResponse playerStateResponse = new PlayerStateResponse();
+            try
+            {
+                var user = await _playerService.GetPlayerById(playerId);
+                var wallet = await _walletService.GetWalletByPlayerById(playerId);
+                var rewards = await _rewardService.GetRewardByPlayerById(playerId);
+
+                playerStateResponse = mapDtoToResponse(user, wallet, rewards);
+                playerStateResponse.isSuccess = true;
+                
+            }
+            catch (Exception ex)
+            {
+                playerStateResponse.isSuccess = false;
+            }
+            return playerStateResponse;
+        }
+
+        [HttpPost("{playerId}/collect/{rewardId}")]
+        public async Task<PlayerStateResponse> PlayerCollectReward([FromRoute] int playerId, [FromRoute] int rewardId)
+        {   
+            PlayerStateResponse playerStateResponse = new PlayerStateResponse();
+
+            try
+            {
+                await _rewardService.CollectPlayerReward(playerId);
+                playerStateResponse = await PlayerGetState(playerId);
+
+            }
+            catch (Exception ex)
+            {
+                playerStateResponse.isSuccess = false;
+            }
+
+            
+            return playerStateResponse;
+        }
+
+        private PlayerStateResponse mapDtoToResponse(Player player, Wallet wallet, Rewards rewards)
+        {
+            PlayerStateResponse playerStateResponse = new PlayerStateResponse();
+            PlayerResponse playerResponse = _mapper.Map<PlayerResponse>(player);
+            WalletResponse walletResponse = _mapper.Map<WalletResponse>(wallet);
+            RewardResponse rewardResponse = _mapper.Map<RewardResponse>(rewards);
+            playerStateResponse.player = playerResponse;
+            playerStateResponse.wallet = walletResponse;
+            playerStateResponse.rewards = rewardResponse;
+            return playerStateResponse;
         }
 
     }

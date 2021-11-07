@@ -11,18 +11,18 @@ namespace Burak.Application.Prize.Data
     {
         public DataContext(DbContextOptions<DataContext> dbContextOptions) : base(dbContextOptions)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+            //modelBuilder.HasDefaultSchema("public");
             base.OnModelCreating(modelBuilder);
         }
 
-        public virtual DbSet<Player> Players { get; set; }
-        public virtual DbSet<Wallet> Wallets { get; set; }
-        public virtual DbSet<Reward> Rewards { get; set; }
-        public virtual DbSet<LevelCompletionReward> LevelCompletionRewards { get; set; }
+        public virtual DbSet<Player> player { get; set; }
+        public virtual DbSet<Wallet> wallet { get; set; }
+        public virtual DbSet<Rewards> rewards { get; set; }
+        public virtual DbSet<LevelCompletionReward> levelcompletionreward { get; set; }
     }
 }

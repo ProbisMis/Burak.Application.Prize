@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Burak.Application.Prize.Data.Models
+namespace Burak.Application.Prize.Models.Response
 {
-    public class Reward
+    public class RewardResponse
     {
         public int Id { get; set; }
 
@@ -13,7 +13,6 @@ namespace Burak.Application.Prize.Data.Models
 
         public int RewardId { get; set; }
 
-        public String Rewards { get; set; }
-
+        public String Reward { get; set; }
     }
 }

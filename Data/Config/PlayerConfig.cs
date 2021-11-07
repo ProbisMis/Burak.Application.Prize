@@ -13,6 +13,8 @@ namespace Burak.Application.Prize.Data.Config
         {
             builder.ToTable(nameof(Player));
             builder.HasKey(model => model.Id);
+            //builder.HasOne(x => x.Wallet).WithOne(c => c.Player).HasForeignKey<Player>(x => x.WalletId);
+            //builder.HasOne(x => x.Reward).WithOne(c => c.Player).HasForeignKey<Player>(x => x.RewardId);
         }
     }
 }
